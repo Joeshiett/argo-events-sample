@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: event-driven-trigger
+spec:
+  templates:
+  - name: event-driven-workflow
+    source:
+      apiVersion: argoproj.io/v1alpha1
+      kind: Workflow
+      metadata:
+        name: event-driven-workflow
+      spec:
+        entrypoint: event-driven-task
+        templates:
+        - name: event-driven-task
+          steps:
+          - - name: hello
+              template: echo-template
+        - name: echo-template
+          inputs:
+            parameters:
+            - name: message
+              value: Hello Argo Workflow!
+          container:
+            image: alpine:latest
+            command: [echo, "{{inputs.parameters.message}}"]
